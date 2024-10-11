@@ -35,6 +35,9 @@ public class GamePanel extends JPanel implements Runnable {
     int count = 0;
     int lastRow, lastCol;
 
+    // Sound
+    public static Sound se = new Sound();
+
     // Checkers
     boolean canMove;
     boolean validSquare;
@@ -176,17 +179,33 @@ public class GamePanel extends JPanel implements Runnable {
 
                         if (activeP.hittingP != null) {
                             pieceTaken = true;
+                            if (!isKingInCheck()) {
+                                se.play(2, false);
+                            }
+                            else {
+                                se.play(1, false);
+                            }
                         }
                         else {
                             pieceTaken = false;
+                            if (!isKingInCheck() && castlingP == null) {
+                                se.play(0, false);
+                            }
+                            else if (isKingInCheck()) {
+                                se.play(1, false);
+                            }
                         }
 
                         if (castlingP != null) {
                             castlingP.updatePosition();
+                            if (!isKingInCheck()) {
+                                se.play(3, false);
+                            }
                         }
 
                         if (isKingInCheck() && isCheckMate()) {
                             gameOver = true;
+                            se.play(1, false);
                             if (count > 0) {
                                 addNotation();
                             }
@@ -200,6 +219,7 @@ public class GamePanel extends JPanel implements Runnable {
                         else {
                             if (canPromote()) {
                                 promotion = true;
+                                se.play(5, false);
                             }
                             else {
                                 if (count > 0) {
@@ -215,6 +235,7 @@ public class GamePanel extends JPanel implements Runnable {
                         copyPieces(pieces, simPieces);
                         activeP.resetPosition();
                         activeP = null;
+                        se.play(4, false);
                     }
                 }
             }
@@ -704,7 +725,7 @@ public class GamePanel extends JPanel implements Runnable {
         board.draw(g2);
 
         // Draw coordinates onto the board
-        
+
 
         // Draw yellow squares to show what the last move made was
         if (count > 0) {
